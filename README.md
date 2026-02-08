@@ -1,5 +1,7 @@
 # Analizador de Repositorios GitHub 🚀
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Repo](https://img.shields.io/badge/github-repo-DarnerDiaz/github--repo--analyzer-blue)](https://github.com/DarnerDiaz/github-repo-analyzer)
+
 Una aplicación web impulsada por IA que analiza repositorios de GitHub y permite conversaciones interactivas sobre su código, estructura y funcionalidad.
 
 ## Características
@@ -31,7 +33,7 @@ Antes de comenzar, asegúrate de tener:
 
 1. **Clona el repositorio**
    ```bash
-   git clone https://github.com/tunombre/github-repo-analyzer.git
+   git clone https://github.com/DarnerDiaz/github-repo-analyzer.git
    cd github-repo-analyzer
    ```
 
@@ -190,7 +192,7 @@ Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE para más deta
 
 Para problemas, preguntas o sugerencias:
 
-1. Consulta la página de [Issues](https://github.com/tunombre/github-repo-analyzer/issues)
+1. Consulta la página de [Issues](https://github.com/DarnerDiaz/github-repo-analyzer/issues)
 2. Crea un nuevo issue con información detallada
 3. Incluye los pasos para reproducir si reportas un bug
 
