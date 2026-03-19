@@ -1,10 +1,37 @@
-# Analizador de Repositorios GitHub 🚀
+# 🤖 GitHub Repository Analyzer - AI-Powered Code Analysis
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Repo](https://img.shields.io/badge/github-repo-DarnerDiaz/github--repo--analyzer-blue)](https://github.com/DarnerDiaz/github-repo-analyzer)
+<div align="center">
 
-Una aplicación web impulsada por IA que analiza repositorios de GitHub y permite conversaciones interactivas sobre su código, estructura y funcionalidad.
+**Analyze any GitHub repository using AI-powered insights and interactive conversations**
 
-## Características
+[![Version](https://img.shields.io/badge/Version-1.0.0-blue)](https://github.com/DarnerDiaz/github-repo-analyzer/releases)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Gemini AI](https://img.shields.io/badge/Gemini-API-orange)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/DarnerDiaz/github-repo-analyzer?style=social)](https://github.com/DarnerDiaz/github-repo-analyzer)
+
+[🚀 Features](#-features-principales) • [💻 Stack](#-stack-tecnológico) • [📦 Setup](#-instalación) • [🤝 Contributing](#-contributing)
+
+</div>
+
+---
+
+## ✨ Acerca del Proyecto
+
+**GitHub Repository Analyzer** es una aplicación web inteligente que usa Google Gemini AI para analizar repositorios de GitHub. Permite hacer preguntas interactivas sobre la estructura, funcionalidad y código de cualquier repo público.
+
+**Casos de uso:**
+- 📚 Aprender cómo están estructurados proyectos populares
+- 🔍 Analizar código de competidores o inspiración
+- 💬 Tener conversaciones sobre cualquier repositorio
+- 📖 Generar documentación automáticamente
+- 🚀 Encontrar patrones y mejores prácticas
+
+---
+
+## ✨ Características Principales
 
 ✨ **Chat Interactivo**: Haz preguntas sobre cualquier repositorio de GitHub usando Google Gemini AI
 📊 **Análisis de Repositorio**: Análisis automático de la estructura, lenguajes y archivos clave del repositorio
