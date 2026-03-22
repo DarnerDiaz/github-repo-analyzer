@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const validationErrors = error.errors
+      const validationErrors = error.issues
         .map((e) => `${e.path.join('.')}: ${e.message}`)
         .join(', ');
       return handleApiError(

@@ -21,7 +21,7 @@ const saveRepositorySchema = z.object({
 export function useRepositoryAnalysis() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const saveAnalysis = useCallback(async (data: Partial<typeof saveRepositorySchema._type>) => {
+  const saveAnalysis = useCallback(async (data: Partial<z.infer<typeof saveRepositorySchema>>) => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/repositories', {
