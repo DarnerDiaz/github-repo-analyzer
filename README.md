@@ -39,21 +39,24 @@
 🔍 **Búsqueda de Código**: Busca y visualiza archivos específicos dentro de repositorios
 📝 **Generación de Documentación**: Genera automáticamente documentación completa para repositorios
 🎨 **Interfaz Moderna**: Interfaz limpia y responsive construida con React y Tailwind CSS
-💾 **Historial Persistente**: Guarda tus análisis y conversaciones en SQLite
+💾 **Historial Persistente**: Guarda análisis y chat en SQLite con sincronización automática
 🕐 **Historial de Conversaciones**: Accede a conversaciones anteriores desde la barra lateral
-🛡️ **Mejor Manejo de Errores**: Error boundaries, toasts y validación robusta
-⚡ **API RESTful**: Endpoints para guardar y recuperar análisis y chat
+🛡️ **Mejor Manejo de Errores**: Error boundaries, toasts y validación robusta con Zod
+⚡ **API RESTful Tipada**: Endpoints para guardar y recuperar análisis con TypeScript tipos seguros
+🔄 **Windows Compatible**: Timeout y retry logic especial para SQLite en Windows
 
 ## Stack Tecnológico
 
-- **Frontend**: Next.js 16+ con React 19 y TypeScript
-- **Backend**: API Routes de Next.js
-- **Base de Datos**: SQLite + Prisma ORM
-- **Estilos**: Tailwind CSS
+- **Frontend**: Next.js 16.1.6 con Turbopack, React 19 y TypeScript 5
+- **Backend**: API Routes de Next.js con Zod validation
+- **Base de Datos**: SQLite + Prisma ORM 5.18.0 (LTS)
+  - Optimizado para Windows (timeout: 10 segundos)
+  - Exponential backoff retry logic (100ms → 200ms → 400ms)
+- **Estilos**: Tailwind CSS 4 + lucide-react (480+ iconos)
 - **IA**: Google Gemini API (generative-ai)
 - **Integración GitHub**: Octokit REST API
-- **Renderizado Markdown**: react-markdown
-- **Validación**: Zod
+- **Validación**: Zod con type inference seguro
+- **Build**: Turbopack para compilación ultra-rápida (3.9s)
 
 ## Requisitos Previos
 
@@ -109,6 +112,8 @@ bash setup.sh
    npx prisma migrate dev
    ```
 
+   **Nota para Windows**: La base de datos SQLite está configurada con un timeout de 10 segundos para evitar bloqueos de archivos. Las operaciones del API incluyen retry logic exponencial automático.
+
 5. **Inicia el servidor de desarrollo**
    ```bash
    npm run dev
@@ -116,6 +121,13 @@ bash setup.sh
 
 6. **Abre tu navegador**
    Navega a [http://localhost:3000](http://localhost:3000)
+
+### Verificar Instalación
+
+Después de iniciar el servidor, deberías ver:
+- ✅ Servidor corriendo en `http://localhost:3000`
+- ⚠️ Advertencia sobre `NEXT_PUBLIC_GEMINI_API_KEY` (normal, configuralo para habilitar IA)
+- 💾 Base de datos SQLite creada en `./dev.db`
 
 ## Uso
 
@@ -245,6 +257,40 @@ La aplicación se puede desplegar en cualquier plataforma de hosting de Node.js:
 - Render
 - Netlify Functions
 
+## Resolución de Problemas
+
+### Error: "Operations timed out" en Windows
+Si ves errores de timeout al guardar datos:
+- ✅ **Arreglado**: DATABASE_URL incluye `timeout=10000` automáticamente
+- La aplicación usa exponential backoff retry logic (3 intentos)
+- No requiere configuración manual
+
+### Error: "NEXT_PUBLIC_GEMINI_API_KEY is not configured"
+- Esto es normal al primer inicio
+- Ve a [Google AI Studio](https://makersuite.google.com/app/apikey) y copia tu clave
+- Agrégala a `.env.local` y reinicia el servidor
+
+### Puerto 3000 ya en uso
+```bash
+# En Windows (PowerShell)
+Stop-Process -Name node -Force
+
+# En Linux/macOS
+lsof -i :3000 | grep LISTEN | awk '{print $2}' | xargs kill
+```
+
+### Build falla en TypeScript
+```bash
+# Regenera los tipos de Prisma
+npx prisma generate
+
+# Limpia el build cache
+rm -rf .next
+
+# Reinicia el build
+npm run build
+```
+
 ## Limitaciones
 
 - La API de GitHub tiene límites de tasa (60 solicitudes/hora sin autenticar, 6000 con token)
@@ -276,8 +322,10 @@ Para problemas, preguntas o sugerencias:
 
 ## Documentación
 
-- [DATABASE.md](./DATABASE.md) - Documentación completa de la base de datos y API
-- [FEATURES_UPDATE.md](./FEATURES_UPDATE.md) - Guía de características nuevas y hooks
+- [API_SETUP.md](./API_SETUP.md) - Guía detallada para configurar las claves de API
+- [DATABASE.md](./DATABASE.md) - Documentación de base de datos, esquema y API
+- [FEATURES_UPDATE.md](./FEATURES_UPDATE.md) - Guía de características nuevas e hooks personalizados
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Resumen técnico de la implementación
 - [QUICK_START.md](./QUICK_START.md) - Guía de inicio rápido
 
 ## Roadmap
