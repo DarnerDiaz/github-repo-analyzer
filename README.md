@@ -39,14 +39,21 @@
 🔍 **Búsqueda de Código**: Busca y visualiza archivos específicos dentro de repositorios
 📝 **Generación de Documentación**: Genera automáticamente documentación completa para repositorios
 🎨 **Interfaz Moderna**: Interfaz limpia y responsive construida con React y Tailwind CSS
+💾 **Historial Persistente**: Guarda tus análisis y conversaciones en SQLite
+🕐 **Historial de Conversaciones**: Accede a conversaciones anteriores desde la barra lateral
+🛡️ **Mejor Manejo de Errores**: Error boundaries, toasts y validación robusta
+⚡ **API RESTful**: Endpoints para guardar y recuperar análisis y chat
 
 ## Stack Tecnológico
 
-- **Frontend**: Next.js 14+ con React y TypeScript
+- **Frontend**: Next.js 16+ con React 19 y TypeScript
+- **Backend**: API Routes de Next.js
+- **Base de Datos**: SQLite + Prisma ORM
 - **Estilos**: Tailwind CSS
 - **IA**: Google Gemini API (generative-ai)
 - **Integración GitHub**: Octokit REST API
 - **Renderizado Markdown**: react-markdown
+- **Validación**: Zod
 
 ## Requisitos Previos
 
@@ -57,6 +64,20 @@ Antes de comenzar, asegúrate de tener:
 - (Opcional) Un Token de Acceso Personal de GitHub para límites de tasa más altos
 
 ## Instalación
+
+### Opción 1: Setup Automático (Recomendado)
+
+**Windows:**
+```bash
+setup.bat
+```
+
+**Linux/macOS:**
+```bash
+bash setup.sh
+```
+
+### Opción 2: Setup Manual
 
 1. **Clona el repositorio**
    ```bash
@@ -75,19 +96,25 @@ Antes de comenzar, asegúrate de tener:
    cp .env.example .env.local
    
    # Edita .env.local y agrega tus claves de API
-   nano .env.local
+   nano .env.local  # o tu editor favorito
    ```
 
    Variables de entorno requeridas:
    - `NEXT_PUBLIC_GEMINI_API_KEY`: Tu clave de API de Google Gemini
    - `GITHUB_TOKEN` (opcional): Token de Acceso Personal de GitHub
+   - `DATABASE_URL`: Ruta a la base de datos SQLite (incluida por defecto)
 
-4. **Inicia el servidor de desarrollo**
+4. **Configura la base de datos**
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. **Inicia el servidor de desarrollo**
    ```bash
    npm run dev
    ```
 
-5. **Abre tu navegador**
+6. **Abre tu navegador**
    Navega a [http://localhost:3000](http://localhost:3000)
 
 ## Uso
@@ -130,20 +157,44 @@ Antes de comenzar, asegúrate de tener:
 ```
 src/
 ├── app/
-│   ├── layout.tsx          # Layout raíz
-│   ├── page.tsx            # Página principal
-│   └── globals.css         # Estilos globales
+│   ├── api/                    # API Routes
+│   │   ├── repositories/       # Guardar análisis
+│   │   ├── chat/               # Sesiones de chat y mensajes
+│   │   └── history/            # Obtener historial
+│   ├── layout.tsx              # Layout raíz
+│   ├── page.tsx                # Página principal
+│   └── globals.css             # Estilos globales
 ├── components/
-│   ├── Chat/               # Componente de interfaz de chat
-│   ├── RepositoryInput/    # Formulario de entrada de repositorio
-│   ├── CodeViewer/         # Componente de vista previa de código
-│   └── DocumentationViewer/# Visualizador de documentación
+│   ├── Chat/                   # Interfaz de chat
+│   ├── RepositoryInput/        # Formulario de entrada
+│   ├── CodeViewer/             # Vista previa de código
+│   ├── DocumentationViewer/    # Visualizador de documentación
+│   ├── HistorySidebar/         # Barra lateral de historial
+│   ├── ErrorBoundary/          # Error boundary
+│   ├── Toast/                  # Notificaciones
+│   └── Skeleton/               # Loaders de esqueleto
 ├── lib/
-│   ├── github.ts           # Integración de API de GitHub
-│   ├── gemini.ts           # Integración de API de Google Gemini
-│   └── utils.ts            # Funciones de utilidad
-└── types/
-    └── index.ts            # Definiciones de tipos TypeScript
+│   ├── github.ts               # Integración GitHub API
+│   ├── gemini.ts               # Integración Gemini AI
+│   ├── prisma.ts               # Cliente Prisma
+│   ├── env.ts                  # Validación de variables de entorno
+│   ├── api.ts                  # Utilidades de API
+│   ├── middleware.ts           # Middleware de error handling
+│   ├── hooks/                  # Custom React hooks
+│   │   ├── useRepositoryAnalysis.ts
+│   │   ├── useChatSession.ts
+│   │   ├── useChatMessages.ts
+│   │   └── useHistory.ts
+│   └── utils.ts                # Funciones de utilidad
+├── types/
+│   └── index.ts                # Definiciones de tipos TypeScript
+└── generated/                  # Generado por Prisma
+    └── prisma/                 # Cliente de Prisma
+
+prisma/
+├── schema.prisma               # Esquema de base de datos
+├── dev.db                      # Base de datos SQLite
+└── migrations/                 # Historial de migraciones
 ```
 
 ## Funciones Clave
@@ -223,16 +274,36 @@ Para problemas, preguntas o sugerencias:
 2. Crea un nuevo issue con información detallada
 3. Incluye los pasos para reproducir si reportas un bug
 
+## Documentación
+
+- [DATABASE.md](./DATABASE.md) - Documentación completa de la base de datos y API
+- [FEATURES_UPDATE.md](./FEATURES_UPDATE.md) - Guía de características nuevas y hooks
+- [QUICK_START.md](./QUICK_START.md) - Guía de inicio rápido
+
 ## Roadmap
 
+### ✅ Implementado en v2.0
+- [x] Historial persistente de conversaciones
+- [x] Base de datos SQLite con Prisma
+- [x] API RESTful para guardar y recuperar análisis
+- [x] Validación robusta de entorno con Zod
+- [x] Error boundaries y manejo de errores mejorado
+- [x] Toasts/notificaciones para feedback del usuario
+- [x] Componentes de skeleton loading
+- [x] Barra lateral de historial de chat
+
+### 📋 Planeado
 - [ ] Vista previa de archivos en tiempo real
 - [ ] Soporte para repositorios privados
 - [ ] Análisis y métricas avanzadas
 - [ ] Sugerencias de revisión de código
 - [ ] Soporte multidioma
-- [ ] Modo oscuro
-- [ ] Exportar análisis como PDF
+- [ ] Modo oscuro mejorado
+- [ ] Exportar análisis como PDF/Markdown
 - [ ] Características de colaboración
+- [ ] Autenticación de usuario
+- [ ] Búsqueda full-text en análisis
+- [ ] Tageo y organización de sesiones
 
 ---
 
