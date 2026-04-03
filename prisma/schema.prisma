@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Repository {
+  id          String @id @default(cuid())
+  owner       String
+  name        String
+  fullName    String @unique
+  url         String
+  stars       Int @default(0)
+  forks       Int @default(0)
+  language    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  analyses     Analysis[]
+  chatSession  ChatSession[]
+
+  @@index([owner, name])
+}
+
+model Analysis {
+  id             String @id @default(cuid())
+  repositoryId   String
+  summary        String
+  structure      String
+  keyFiles       String
+  technologies   String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  repository     Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@index([repositoryId])
+}
+
+model ChatSession {
+  id             String @id @default(cuid())
+  repositoryId   String
+  title          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  repository     Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  messages       ChatMessage[]
+
+  @@index([repositoryId])
+}
+
+model ChatMessage {
+  id        String @id @default(cuid())
+  sessionId String
+  role      String // 'user' or 'assistant'
+  content   String
+  createdAt DateTime @default(now())
+
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}

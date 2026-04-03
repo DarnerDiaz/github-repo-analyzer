@@ -1,7 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ChatContextData } from '@/types';
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
+// Validate API key on initialization
+if (!apiKey) {
+  console.warn(
+    '⚠️ NEXT_PUBLIC_GEMINI_API_KEY is not configured. AI features will be unavailable. Configure it in .env.local'
+  );
+}
+
+const genAI = new GoogleGenerativeAI(apiKey || 'sk-dummy-key-for-offline-mode');
 
 export interface ChatRequest {
   message: string;
@@ -17,6 +26,17 @@ export interface ChatResponse {
 export async function sendMessageToGemini(
   request: ChatRequest
 ): Promise<ChatResponse> {
+  // Check if API key is configured
+  if (!apiKey || apiKey.trim() === '') {
+    const errorMsg =
+      'AI features are not configured. Please add NEXT_PUBLIC_GEMINI_API_KEY to .env.local\n\n' +
+      'Steps:\n' +
+      '1. Get a free API key from https://makersuite.google.com/app/apikey\n' +
+      '2. Add it to .env.local: NEXT_PUBLIC_GEMINI_API_KEY=your_key_here\n' +
+      '3. Restart the dev server';
+    throw new Error(errorMsg);
+  }
+
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
@@ -69,8 +89,31 @@ Repository Analysis:
       response,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Provide specific guidance for API key issues
+    if (
+      errorMessage.includes('Method doesn\'t allow unregistered callers') ||
+      errorMessage.includes('API key') ||
+      errorMessage.includes('authentication') ||
+      errorMessage.includes('401') ||
+      errorMessage.includes('403')
+    ) {
+      throw new Error(
+        'Invalid or missing Google Gemini API Key.\n\n' +
+          'Get a free API key:\n' +
+          '1. Visit https://makersuite.google.com/app/apikey\n' +
+          '2. Copy your API key\n' +
+          '3. Add to .env.local: NEXT_PUBLIC_GEMINI_API_KEY=your_key\n' +
+          '4. Restart dev server\n\n' +
+          `Details: ${errorMessage}`
+      );
+    }
+
     console.error('Error sending message to Gemini:', error);
-    throw new Error('Failed to get response from AI model');
+    throw new Error(
+      'Failed to get response from AI model. Please check your API configuration.'
+    );
   }
 }
 

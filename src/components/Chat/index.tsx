@@ -5,6 +5,8 @@ import { ChatMessage, Repository, AnalysisResult } from '@/types';
 import { sendMessageToGemini } from '@/lib/gemini';
 import { generateId, formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
+import { useChatSession, useChatMessages, useRepositoryAnalysis } from '@/lib/hooks';
+import ConfigStatus from '@/components/ConfigStatus';
 
 interface ChatProps {
   repository: Repository;
@@ -16,6 +18,13 @@ export default function Chat({ repository, analysis }: ChatProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [repositoryId, setRepositoryId] = useState<string | null>(null);
+  const [hasApiKey, setHasApiKey] = useState(true);
+  
+  const { createSession } = useChatSession();
+  const { addMessage: addMessageToDb } = useChatMessages(sessionId);
+  const { saveAnalysis } = useRepositoryAnalysis();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -25,6 +34,59 @@ export default function Chat({ repository, analysis }: ChatProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Check if API key is configured
+  useEffect(() => {
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    setHasApiKey(!!apiKey && apiKey.trim().length > 0);
+  }, []);
+
+  // Initialize chat session on mount
+  useEffect(() => {
+    const initSession = async () => {
+      try {
+        // Prepare analysis data for saving
+        const analysisData = {
+          owner: repository.owner,
+          name: repository.repo,
+          url: repository.url,
+          stars: repository.stars || 0,
+          forks: repository.forks || 0,
+          language: repository.language || '',
+          description: repository.description || '',
+          summary: analysis.summary || 'Repository analysis',
+          structure: JSON.stringify(analysis.structure || []),
+          keyFiles: Array.isArray(analysis.keyFiles) 
+            ? JSON.stringify(analysis.keyFiles)
+            : (analysis.keyFiles || '[]'),
+          technologies: Array.isArray(analysis.mainLanguages)
+            ? JSON.stringify(analysis.mainLanguages)
+            : (analysis.mainLanguages || '[]'),
+        };
+
+        console.log('Saving analysis with data:', analysisData);
+        
+        // Save analysis first
+        const analysisResult = await saveAnalysis(analysisData);
+
+        if (analysisResult?.repository?.id) {
+          setRepositoryId(analysisResult.repository.id);
+
+          // Create chat session
+          const session = await createSession(analysisResult.repository.id);
+          if (session?.id) {
+            setSessionId(session.id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to initialize chat session:', err);
+        setError('Failed to initialize chat. Starting offline mode.');
+        // Still allow offline mode - messages won't be saved but chat works
+      }
+    };
+
+    initSession();
+  }, [repository, analysis, saveAnalysis, createSession]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +106,16 @@ export default function Chat({ repository, analysis }: ChatProps) {
     setError('');
 
     try {
+      // Save user message to database
+      if (sessionId) {
+        try {
+          await addMessageToDb('user', input);
+        } catch (dbErr) {
+          console.warn('Failed to save user message:', dbErr);
+          // Continue even if database save fails
+        }
+      }
+
       const conversationHistory = messages.map((msg) => ({
         role: msg.role,
         content: msg.content,
@@ -66,9 +138,21 @@ export default function Chat({ repository, analysis }: ChatProps) {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // Save assistant message to database
+      if (sessionId) {
+        try {
+          await addMessageToDb('assistant', response.response);
+        } catch (dbErr) {
+          console.warn('Failed to save assistant message:', dbErr);
+          // Continue even if database save fails
+        }
+      }
     } catch (err) {
-      setError('Failed to get response. Please check your API key.');
-      console.error(err);
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to get response from AI.';
+      setError(errorMessage);
+      console.error('Chat error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +172,8 @@ export default function Chat({ repository, analysis }: ChatProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <ConfigStatus hasApiKey={hasApiKey} />
+
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full text-gray-500">
             <p>Start asking questions about the repository...</p>
@@ -127,7 +213,7 @@ export default function Chat({ repository, analysis }: ChatProps) {
         ))}
 
         {error && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
+          <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm whitespace-pre-line">
             {error}
           </div>
         )}

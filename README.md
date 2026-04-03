@@ -1,10 +1,37 @@
-# Analizador de Repositorios GitHub 🚀
+# 🤖 GitHub Repository Analyzer - AI-Powered Code Analysis
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Repo](https://img.shields.io/badge/github-repo-DarnerDiaz/github--repo--analyzer-blue)](https://github.com/DarnerDiaz/github-repo-analyzer)
+<div align="center">
 
-Una aplicación web impulsada por IA que analiza repositorios de GitHub y permite conversaciones interactivas sobre su código, estructura y funcionalidad.
+**Analyze any GitHub repository using AI-powered insights and interactive conversations**
 
-## Características
+[![Version](https://img.shields.io/badge/Version-1.0.0-blue)](https://github.com/DarnerDiaz/github-repo-analyzer/releases)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Gemini AI](https://img.shields.io/badge/Gemini-API-orange)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/DarnerDiaz/github-repo-analyzer?style=social)](https://github.com/DarnerDiaz/github-repo-analyzer)
+
+[🚀 Features](#-features-principales) • [💻 Stack](#-stack-tecnológico) • [📦 Setup](#-instalación) • [🤝 Contributing](#-contributing)
+
+</div>
+
+---
+
+## ✨ Acerca del Proyecto
+
+**GitHub Repository Analyzer** es una aplicación web inteligente que usa Google Gemini AI para analizar repositorios de GitHub. Permite hacer preguntas interactivas sobre la estructura, funcionalidad y código de cualquier repo público.
+
+**Casos de uso:**
+- 📚 Aprender cómo están estructurados proyectos populares
+- 🔍 Analizar código de competidores o inspiración
+- 💬 Tener conversaciones sobre cualquier repositorio
+- 📖 Generar documentación automáticamente
+- 🚀 Encontrar patrones y mejores prácticas
+
+---
+
+## ✨ Características Principales
 
 ✨ **Chat Interactivo**: Haz preguntas sobre cualquier repositorio de GitHub usando Google Gemini AI
 📊 **Análisis de Repositorio**: Análisis automático de la estructura, lenguajes y archivos clave del repositorio
@@ -12,14 +39,24 @@ Una aplicación web impulsada por IA que analiza repositorios de GitHub y permit
 🔍 **Búsqueda de Código**: Busca y visualiza archivos específicos dentro de repositorios
 📝 **Generación de Documentación**: Genera automáticamente documentación completa para repositorios
 🎨 **Interfaz Moderna**: Interfaz limpia y responsive construida con React y Tailwind CSS
+💾 **Historial Persistente**: Guarda análisis y chat en SQLite con sincronización automática
+🕐 **Historial de Conversaciones**: Accede a conversaciones anteriores desde la barra lateral
+🛡️ **Mejor Manejo de Errores**: Error boundaries, toasts y validación robusta con Zod
+⚡ **API RESTful Tipada**: Endpoints para guardar y recuperar análisis con TypeScript tipos seguros
+🔄 **Windows Compatible**: Timeout y retry logic especial para SQLite en Windows
 
 ## Stack Tecnológico
 
-- **Frontend**: Next.js 14+ con React y TypeScript
-- **Estilos**: Tailwind CSS
+- **Frontend**: Next.js 16.1.6 con Turbopack, React 19 y TypeScript 5
+- **Backend**: API Routes de Next.js con Zod validation
+- **Base de Datos**: SQLite + Prisma ORM 5.18.0 (LTS)
+  - Optimizado para Windows (timeout: 10 segundos)
+  - Exponential backoff retry logic (100ms → 200ms → 400ms)
+- **Estilos**: Tailwind CSS 4 + lucide-react (480+ iconos)
 - **IA**: Google Gemini API (generative-ai)
 - **Integración GitHub**: Octokit REST API
-- **Renderizado Markdown**: react-markdown
+- **Validación**: Zod con type inference seguro
+- **Build**: Turbopack para compilación ultra-rápida (3.9s)
 
 ## Requisitos Previos
 
@@ -30,6 +67,20 @@ Antes de comenzar, asegúrate de tener:
 - (Opcional) Un Token de Acceso Personal de GitHub para límites de tasa más altos
 
 ## Instalación
+
+### Opción 1: Setup Automático (Recomendado)
+
+**Windows:**
+```bash
+setup.bat
+```
+
+**Linux/macOS:**
+```bash
+bash setup.sh
+```
+
+### Opción 2: Setup Manual
 
 1. **Clona el repositorio**
    ```bash
@@ -48,20 +99,35 @@ Antes de comenzar, asegúrate de tener:
    cp .env.example .env.local
    
    # Edita .env.local y agrega tus claves de API
-   nano .env.local
+   nano .env.local  # o tu editor favorito
    ```
 
    Variables de entorno requeridas:
    - `NEXT_PUBLIC_GEMINI_API_KEY`: Tu clave de API de Google Gemini
    - `GITHUB_TOKEN` (opcional): Token de Acceso Personal de GitHub
+   - `DATABASE_URL`: Ruta a la base de datos SQLite (incluida por defecto)
 
-4. **Inicia el servidor de desarrollo**
+4. **Configura la base de datos**
+   ```bash
+   npx prisma migrate dev
+   ```
+
+   **Nota para Windows**: La base de datos SQLite está configurada con un timeout de 10 segundos para evitar bloqueos de archivos. Las operaciones del API incluyen retry logic exponencial automático.
+
+5. **Inicia el servidor de desarrollo**
    ```bash
    npm run dev
    ```
 
-5. **Abre tu navegador**
+6. **Abre tu navegador**
    Navega a [http://localhost:3000](http://localhost:3000)
+
+### Verificar Instalación
+
+Después de iniciar el servidor, deberías ver:
+- ✅ Servidor corriendo en `http://localhost:3000`
+- ⚠️ Advertencia sobre `NEXT_PUBLIC_GEMINI_API_KEY` (normal, configuralo para habilitar IA)
+- 💾 Base de datos SQLite creada en `./dev.db`
 
 ## Uso
 
@@ -103,20 +169,44 @@ Antes de comenzar, asegúrate de tener:
 ```
 src/
 ├── app/
-│   ├── layout.tsx          # Layout raíz
-│   ├── page.tsx            # Página principal
-│   └── globals.css         # Estilos globales
+│   ├── api/                    # API Routes
+│   │   ├── repositories/       # Guardar análisis
+│   │   ├── chat/               # Sesiones de chat y mensajes
+│   │   └── history/            # Obtener historial
+│   ├── layout.tsx              # Layout raíz
+│   ├── page.tsx                # Página principal
+│   └── globals.css             # Estilos globales
 ├── components/
-│   ├── Chat/               # Componente de interfaz de chat
-│   ├── RepositoryInput/    # Formulario de entrada de repositorio
-│   ├── CodeViewer/         # Componente de vista previa de código
-│   └── DocumentationViewer/# Visualizador de documentación
+│   ├── Chat/                   # Interfaz de chat
+│   ├── RepositoryInput/        # Formulario de entrada
+│   ├── CodeViewer/             # Vista previa de código
+│   ├── DocumentationViewer/    # Visualizador de documentación
+│   ├── HistorySidebar/         # Barra lateral de historial
+│   ├── ErrorBoundary/          # Error boundary
+│   ├── Toast/                  # Notificaciones
+│   └── Skeleton/               # Loaders de esqueleto
 ├── lib/
-│   ├── github.ts           # Integración de API de GitHub
-│   ├── gemini.ts           # Integración de API de Google Gemini
-│   └── utils.ts            # Funciones de utilidad
-└── types/
-    └── index.ts            # Definiciones de tipos TypeScript
+│   ├── github.ts               # Integración GitHub API
+│   ├── gemini.ts               # Integración Gemini AI
+│   ├── prisma.ts               # Cliente Prisma
+│   ├── env.ts                  # Validación de variables de entorno
+│   ├── api.ts                  # Utilidades de API
+│   ├── middleware.ts           # Middleware de error handling
+│   ├── hooks/                  # Custom React hooks
+│   │   ├── useRepositoryAnalysis.ts
+│   │   ├── useChatSession.ts
+│   │   ├── useChatMessages.ts
+│   │   └── useHistory.ts
+│   └── utils.ts                # Funciones de utilidad
+├── types/
+│   └── index.ts                # Definiciones de tipos TypeScript
+└── generated/                  # Generado por Prisma
+    └── prisma/                 # Cliente de Prisma
+
+prisma/
+├── schema.prisma               # Esquema de base de datos
+├── dev.db                      # Base de datos SQLite
+└── migrations/                 # Historial de migraciones
 ```
 
 ## Funciones Clave
@@ -167,6 +257,40 @@ La aplicación se puede desplegar en cualquier plataforma de hosting de Node.js:
 - Render
 - Netlify Functions
 
+## Resolución de Problemas
+
+### Error: "Operations timed out" en Windows
+Si ves errores de timeout al guardar datos:
+- ✅ **Arreglado**: DATABASE_URL incluye `timeout=10000` automáticamente
+- La aplicación usa exponential backoff retry logic (3 intentos)
+- No requiere configuración manual
+
+### Error: "NEXT_PUBLIC_GEMINI_API_KEY is not configured"
+- Esto es normal al primer inicio
+- Ve a [Google AI Studio](https://makersuite.google.com/app/apikey) y copia tu clave
+- Agrégala a `.env.local` y reinicia el servidor
+
+### Puerto 3000 ya en uso
+```bash
+# En Windows (PowerShell)
+Stop-Process -Name node -Force
+
+# En Linux/macOS
+lsof -i :3000 | grep LISTEN | awk '{print $2}' | xargs kill
+```
+
+### Build falla en TypeScript
+```bash
+# Regenera los tipos de Prisma
+npx prisma generate
+
+# Limpia el build cache
+rm -rf .next
+
+# Reinicia el build
+npm run build
+```
+
 ## Limitaciones
 
 - La API de GitHub tiene límites de tasa (60 solicitudes/hora sin autenticar, 6000 con token)
@@ -196,16 +320,38 @@ Para problemas, preguntas o sugerencias:
 2. Crea un nuevo issue con información detallada
 3. Incluye los pasos para reproducir si reportas un bug
 
+## Documentación
+
+- [API_SETUP.md](./API_SETUP.md) - Guía detallada para configurar las claves de API
+- [DATABASE.md](./DATABASE.md) - Documentación de base de datos, esquema y API
+- [FEATURES_UPDATE.md](./FEATURES_UPDATE.md) - Guía de características nuevas e hooks personalizados
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Resumen técnico de la implementación
+- [QUICK_START.md](./QUICK_START.md) - Guía de inicio rápido
+
 ## Roadmap
 
+### ✅ Implementado en v2.0
+- [x] Historial persistente de conversaciones
+- [x] Base de datos SQLite con Prisma
+- [x] API RESTful para guardar y recuperar análisis
+- [x] Validación robusta de entorno con Zod
+- [x] Error boundaries y manejo de errores mejorado
+- [x] Toasts/notificaciones para feedback del usuario
+- [x] Componentes de skeleton loading
+- [x] Barra lateral de historial de chat
+
+### 📋 Planeado
 - [ ] Vista previa de archivos en tiempo real
 - [ ] Soporte para repositorios privados
 - [ ] Análisis y métricas avanzadas
 - [ ] Sugerencias de revisión de código
 - [ ] Soporte multidioma
-- [ ] Modo oscuro
-- [ ] Exportar análisis como PDF
+- [ ] Modo oscuro mejorado
+- [ ] Exportar análisis como PDF/Markdown
 - [ ] Características de colaboración
+- [ ] Autenticación de usuario
+- [ ] Búsqueda full-text en análisis
+- [ ] Tageo y organización de sesiones
 
 ---
 

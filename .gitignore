@@ -22,6 +22,41 @@
 
 # misc
 .DS_Store
+.env*
+!.env.example
+.env.local
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.idea
+.vscode/*.local
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Turbopack
+.turbopack
+/build
+
+# misc
+.DS_Store
 *.pem
 
 # debug
@@ -43,3 +78,5 @@ next-env.d.ts
 # IDEs
 .vscode/
 .idea/
+
+/src/generated/prisma
