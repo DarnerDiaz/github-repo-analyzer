@@ -1,3 +1,13 @@
+/**
+ * Parses a GitHub repository URL to extract owner and repository name
+ * @param {string} url - Full GitHub URL (e.g., 'https://github.com/user/repo' or 'https://github.com/user/repo.git')
+ * @returns {{ owner: string; repo: string } | null} Parsed owner and repo, or null if URL is invalid
+ * @example
+ * ```typescript
+ * parseGitHubUrl('https://github.com/DarnerDiaz/openapi-to-ts');  
+ * // Returns: { owner: 'DarnerDiaz', repo: 'openapi-to-ts' }
+ * ```
+ */
 export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
   const match = url.match(/github\.com\/([^/]+)\/([^/]+)/);
   if (!match) return null;
@@ -8,10 +18,29 @@ export function parseGitHubUrl(url: string): { owner: string; repo: string } | n
   };
 }
 
+/**
+ * Generates a unique ID combining timestamp and random string
+ * @returns {string} Unique identifier in format: `{timestamp}-{randomstring}`
+ * @example
+ * ```typescript
+ * const id = generateId();
+ * // Returns: '1703010234567-a1b2c3d4e'
+ * ```
+ */
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
+/**
+ * Formats a Date object into a readable time string with AM/PM
+ * @param {Date} date - Date object to format
+ * @returns {string} Formatted time string (e.g., '09:30 AM')
+ * @example
+ * ```typescript
+ * formatDate(new Date('2024-12-25T14:30:00Z'));
+ * // Returns: '02:30 PM'
+ * ```
+ */
 export function formatDate(date: Date): string {
   return date.toLocaleString('en-US', {
     hour: '2-digit',
