@@ -3,6 +3,18 @@ import { Repository, RepositoryFile, AnalysisResult } from '@/types';
 
 const octokit = new Octokit();
 
+/**
+ * Fetches basic information about a GitHub repository
+ * @param {string} owner - GitHub username or organization name
+ * @param {string} repo - Repository name
+ * @returns {Promise<Repository>} Repository metadata including stars, forks, language, and description
+ * @throws {Error} If repository not found or API request fails
+ * @example
+ * ```typescript
+ * const repoInfo = await getRepositoryInfo('DarnerDiaz', 'openapi-to-ts');
+ * console.log(repoInfo.stars); // 42
+ * ```
+ */
 export async function getRepositoryInfo(
   owner: string,
   repo: string
@@ -23,6 +35,19 @@ export async function getRepositoryInfo(
   };
 }
 
+/**
+ * Recursively fetches the repository directory structure and file information
+ * @param {string} owner - GitHub username or organization name
+ * @param {string} repo - Repository name
+ * @param {string} [path=''] - Subdirectory path (empty string for root)
+ * @returns {Promise<RepositoryFile[]>} Array of files and directories with metadata
+ * @throws {Error} If path not found or API request fails
+ * @example
+ * ```typescript
+ * const files = await getRepositoryStructure('DarnerDiaz', 'openapi-to-ts');
+ * const srcFiles = files.filter(f => f.name === 'src');
+ * ```
+ */
 export async function getRepositoryStructure(
   owner: string,
   repo: string,
